@@ -13,7 +13,10 @@ if matplotlib.get_backend().lower().endswith('agg'):
             pass
 
 import matplotlib.pyplot as plt
+
 from matplotlib.animation import FuncAnimation
+
+
 
 from CoinInvest import DBRead
 
@@ -48,10 +51,14 @@ PB_DW_TH = 0.2
 MFI_UP_TH =70
 MFI_DW_TH =20
 
+
 fig, axes = plt.subplots(4, 1, figsize=(24, 16))
 
 
 def update(_frame=None):
+
+
+
     dbu = DBRead.DBReader()
     df = dbu.read_xrp(coin_type='XRP')
 
@@ -164,7 +171,11 @@ def update(_frame=None):
     axes[2].legend(loc='upper left')
     axes[2].grid(True)
 
+
     axes[3].set_title('V_BW*BW')
+
+
+
     axes[3].plot(df.index, df['SQRT_BW'],  color='k',label='SQRT BW*BBW')
     if df.SQRT_BWCHG.values[len(df.SQRT_BWCHG)-1] >=0 :
         axes[3].plot(df.index, df['SQRT_BWCHG'],  color='r',label='SQRT BWCHG')
@@ -174,9 +185,17 @@ def update(_frame=None):
     axes[3].legend(loc='upper left')
     axes[3].grid(True)
 
+
     fig.tight_layout()
+
+
+    fig.tight_layout()
+    fig.canvas.draw()
+    fig.canvas.flush_events()
 
 
 ani = FuncAnimation(fig, update, interval=60000, cache_frame_data=False)
 update()
 plt.show()
+
+
