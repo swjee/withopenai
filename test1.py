@@ -1,7 +1,18 @@
 import time
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
+
+# GUI 백엔드가 아닌 경우(예: Agg) 창이 뜨지 않으므로 인터랙티브 백엔드로 전환 시도
+if matplotlib.get_backend().lower().endswith('agg'):
+    for candidate_backend in ('TkAgg', 'Qt5Agg'):
+        try:
+            matplotlib.use(candidate_backend, force=True)
+            break
+        except Exception:
+            pass
+
+import matplotlib.pyplot as plt
 
 from CoinInvest import DBRead
 
@@ -19,6 +30,9 @@ def play(text):
 
 
 print ('test DBREAD')
+print(f"matplotlib backend: {matplotlib.get_backend()}")
+if matplotlib.get_backend().lower().endswith('agg'):
+    print('WARNING: GUI backend not available. 화면 창이 표시되지 않을 수 있습니다.')
 
 # 1m, 3m, 5m, 10m, 30m, 1h, 6h, 12h, 24h
 
