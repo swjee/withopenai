@@ -14,6 +14,10 @@ if matplotlib.get_backend().lower().endswith('agg'):
 
 import matplotlib.pyplot as plt
 
+from matplotlib.animation import FuncAnimation
+
+
+
 from CoinInvest import DBRead
 
 from audioplayer import AudioPlayer
@@ -47,12 +51,14 @@ PB_DW_TH = 0.2
 MFI_UP_TH =70
 MFI_DW_TH =20
 
-plt.ion()
-fig, axes = plt.subplots(4, 1, figsize=(24, 16))
-plt.show(block=False)
-plt.pause(0.1)
 
-while plt.fignum_exists(fig.number):
+fig, axes = plt.subplots(4, 1, figsize=(24, 16))
+
+
+def update(_frame=None):
+
+
+
     dbu = DBRead.DBReader()
     df = dbu.read_xrp(coin_type='XRP')
 
@@ -112,24 +118,20 @@ while plt.fignum_exists(fig.number):
         if df.PB.values[i] < 0.1 and df.IIP21.values[i]>0 :
             axes[0].plot(df.index.values[i], df.close.values[i], 'k^')
             if i > len(df.close) - 3:
-                #ctypes.windll.user32.MessageBoxW(0, "반전 매수타이밍.!", "알림", 1)
                 play("반전 매수 타이밍입니다.")
         elif df.PB.values[i] > 0.9 and df.IIP21.values[i]<0 :
             axes[0].plot(df.index.values[i], df.close.values[i], 'yv')
             if i > len(df.close) - 3 :
-                #ctypes.windll.user32.MessageBoxW(0, "반전 매도타이밍.!", "알림", 1)
                 play("반전 매도 타이밍입니다.")
 
 
         if  df.PB.values[i] > PB_UP_TH and df.MFI10.values[i] > MFI_UP_TH:
             axes[0].plot( df.index.values[i],df.close.values[i],'r^')
             if i > len(df.close) - 3:
-                #ctypes.windll.user32.MessageBoxW(0, "매수추세!", "알림", 1)
                 play("매수 추세!.")
         elif df.PB.values[i] < PB_DW_TH and df.MFI10.values[i] < MFI_DW_TH :
             axes[0].plot( df.index.values[i],df.close.values[i],'bv')
             if i > len(df.close) - 3:
-                #ctypes.windll.user32.MessageBoxW(0, "매도추세!", "알림", 1)
                 play("매도 추세!.")
 
 
@@ -169,37 +171,31 @@ while plt.fignum_exists(fig.number):
     axes[2].legend(loc='upper left')
     axes[2].grid(True)
 
-#    #  II%.. plot
-#    plt.subplot(4,1,3)
-#    plt.title('IIP21')
-#    plt.plot(df.index, df['IIP21'],  color='g',label='II% 21day')
-#
-#    for i in range(len(df.close) - 1):
-#        if df.PB.values[i] < 0.1 and df.IIP21.values[i] > 0:
-#            plt.plot(df.index.values[i], 0 , 'r^')
-#        elif df.PB.values[i] > 0.9 and df.IIP21.values[i] < 0:
-#            plt.plot(df.index.values[i], 0 , 'bv')
-#
 
-    axes[2].legend(loc='upper left')
-    axes[2].grid(True)
-
-    #  volume.. plot
     axes[3].set_title('V_BW*BW')
-#    plt.plot(df.index, df['V_PB'],  color='k',label='V_PB')
-#    plt.plot(df.index, df['PB'],  color='b',label='PB')
+
+
+
     axes[3].plot(df.index, df['SQRT_BW'],  color='k',label='SQRT BW*BBW')
     if df.SQRT_BWCHG.values[len(df.SQRT_BWCHG)-1] >=0 :
         axes[3].plot(df.index, df['SQRT_BWCHG'],  color='r',label='SQRT BWCHG')
     else:
         axes[3].plot(df.index, df['SQRT_BWCHG'],  color='b',label='SQRT BWCHG')
 
-
     axes[3].legend(loc='upper left')
     axes[3].grid(True)
+
+
+    fig.tight_layout()
+
 
     fig.tight_layout()
     fig.canvas.draw()
     fig.canvas.flush_events()
 
-    plt.pause(10)
+
+ani = FuncAnimation(fig, update, interval=60000, cache_frame_data=False)
+update()
+plt.show()
+
+
