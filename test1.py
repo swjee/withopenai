@@ -35,8 +35,10 @@ MFI_DW_TH =20
 
 plt.ion()
 fig, axes = plt.subplots(4, 1, figsize=(24, 16))
+plt.show(block=False)
+plt.pause(0.1)
 
-while True:
+while plt.fignum_exists(fig.number):
     dbu = DBRead.DBReader()
     df = dbu.read_xrp(coin_type='XRP')
 
@@ -183,6 +185,7 @@ while True:
     axes[3].grid(True)
 
     fig.tight_layout()
-    fig.canvas.draw_idle()
+    fig.canvas.draw()
+    fig.canvas.flush_events()
 
     plt.pause(10)
